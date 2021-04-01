@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation }) => {
       data: {
         message: 'مَرْحَبَاً !\nيُمْكِنُكَ سُؤَالِي أحَدَ الأسْئِلَة التَالِية..',
       },
-      // goToOnEnd: 'qa'
+      goToOnEnd: 'qa'
     })
   }
 
