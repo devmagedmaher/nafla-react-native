@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/home';
 import QAScreen from './screens/qa';
+import Tts from 'react-native-tts';
 
 
 const Stack = createStackNavigator();
 
 const App = () => {
+
+
+  useEffect(() => {
+    Tts.getInitStatus();
+    Tts.setDefaultLanguage('ar');
+    Tts.voices()
+      .then(voices => voices.filter(e => e.language.startsWith('ar')))
+      .then(data => data[0].id)
+      .then(voiceId => Tts.setDefaultVoice(voiceId));
+
+  }, [])
+
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="home" headerMode='none'>
