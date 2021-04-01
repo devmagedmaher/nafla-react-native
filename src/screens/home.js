@@ -1,13 +1,19 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import AutoListener from '../components/auto-listener';
+import Tts from 'react-native-tts';
 
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
 
   
   const handleListenerResult = text => {
-    console.log({ text });
+    navigation.navigate('message', {
+      data: {
+        message: 'مَرْحَبَاً !\nيُمْكِنُكَ سُؤَالِي أحَدَ الأسْئِلَة التَالِية..',
+      },
+      // goToOnEnd: 'qa'
+    })
   }
 
 
