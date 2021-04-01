@@ -1,10 +1,35 @@
-import React from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, Text, ToastAndroid } from 'react-native';
 import QAList from '../constants/qa-list';
+import AutoListener from '../components/auto-listener';
+import { assistant } from '../services/ibm-watson';
 
 
-const QAScreen = () => {
-  return (
+const QAScreen = ({ navigation }) => {
+  const [error, setError] = useState(false);
+
+
+  const handleOnListenerResult = text => {
+    setError(false);
+
+    assistant(text)
+      .then(({ data }) => {
+        console.log({ data });
+        navigation.navigate('message', {
+          data: {
+            message: data.message
+          },
+        })
+      })
+      .catch(error => {
+        console.log({ error });
+        ToastAndroid.show('حدث خطأ بالسيرفر.', ToastAndroid.SHORT);
+        setError(true);
+      });
+  }
+
+
+  return (<>
     <View style={styles.container}>
       <Text style={styles.title}>يمكنك سؤالي أحد الأسئلة التالية:-</Text>
       <FlatList
@@ -15,7 +40,8 @@ const QAScreen = () => {
         keyExtractor={item => item.id.toString()}
       />
     </View>
-  )
+    <AutoListener onResult={handleOnListenerResult} restartListener={error} />
+  </>)
 }
 
 const styles = StyleSheet.create({
