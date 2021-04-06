@@ -35,10 +35,16 @@ const BluetoothScreen = () => {
     if (connection.onDataReceived) {
       console.log('connected to ', connection.name);
 
-      connection.onDataReceived(data => {
-        console.log({ data });
-        Alert.alert(null, JSON.stringify(data));
+      console.log('listen to onDataReceive event');
+      const subscription = connection.onDataReceived(({ data }) => {
+        subscription.remove();
+        console.log('data: ', data);
       });
+
+      return () => {
+        console.log('unsubscribe to onDataReceive listener');
+        subscription.remove();
+      }
     }
   }, [connection]);
 
