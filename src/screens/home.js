@@ -1,13 +1,15 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import AutoListener from '../components/auto-listener';
-import Tts from 'react-native-tts';
+import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/core';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import RNBC from 'react-native-bluetooth-classic';
 
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
+  const { deviceId } = route.params;
+  const [isLoading, setIsLoading] = useState(true);
 
   
-  const handleListenerResult = text => {
+  const handleOnCloseDistance = text => {
     navigation.navigate('message', {
       data: {
         message: 'مَرْحَبَاً !\nيُمْكِنُكَ سُؤَالِي أحَدَ الأسْئِلَة التَالِية..',
@@ -16,12 +18,52 @@ const HomeScreen = ({ navigation }) => {
     })
   }
 
+  const stopOnDataReceived = subscription => {
+    console.log('stop Receiving data from arduino');
+    subscription.remove();
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+
+      let subscription = () => 0;
+      RNBC.getConnectedDevice(deviceId)
+        .then(device => {
+          console.log('start receiving data from arduino..');
+          subscription = device.onDataReceived(({ data }) => {
+            console.log({ data });
+            if (data.replace(/^\s+|\s+$/g, '') == '1') {
+              console.log('starting conversation..');
+              stopOnDataReceived(subscription);
+              handleOnCloseDistance();
+            }
+          })
+        })
+        .catch(error => {
+          console.log({ error });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+  
+      return () => {
+        stopOnDataReceived(subscription);
+      }  
+
+    }, [])
+  );
+
+  useEffect(() => {
+  }, [navigation]);
 
   return (<>
     <View style={styles.container}>
-      <Text style={styles.text}>تحدث للبدأ..</Text>
+      {isLoading ? (
+        <ActivityIndicator size='large' color='999' />
+      ) : (
+        <Text style={styles.text}>إقترب للبدأ..</Text>
+      )}
     </View>
-    <AutoListener onResult={handleListenerResult} />
   </>)
 }
 

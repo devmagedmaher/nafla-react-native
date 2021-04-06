@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { StackActions } from '@react-navigation/routers';
 import { View, Text, ActivityIndicator, FlatList, Button, StyleSheet, Alert } from 'react-native';
 import RNBC from 'react-native-bluetooth-classic';
 
 
-const BluetoothScreen = () => {
+const BluetoothScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [pairedList, setPairedList] = useState([]);
-  const [connection, setConnection] = useState({});
 
 
   const getPairedDevices = () => {
@@ -31,23 +31,6 @@ const BluetoothScreen = () => {
 
   }, []);
 
-  useEffect(() => {
-    if (connection.onDataReceived) {
-      console.log('connected to ', connection.name);
-
-      console.log('listen to onDataReceive event');
-      const subscription = connection.onDataReceived(({ data }) => {
-        subscription.remove();
-        console.log('data: ', data);
-      });
-
-      return () => {
-        console.log('unsubscribe to onDataReceive listener');
-        subscription.remove();
-      }
-    }
-  }, [connection]);
-
   const connectToDevice = async device => {
     setIsLoading(true);
 
@@ -61,7 +44,9 @@ const BluetoothScreen = () => {
         console.log(device.name, ' device is already connected.');
         Alert.alert(null, 'أنت بالفعل متصل بهذا الجهاز');
       }
-      setConnection(device);
+      navigation.dispatch(
+        StackActions.replace('home', { deviceId: device.id })
+      );      
     } catch (error) {
       console.log({ error });
     }
@@ -89,7 +74,6 @@ const BluetoothScreen = () => {
             <Button 
               title={device.name} 
               onPress={() => connectToDevice(device)} 
-              color={connection.id === device.id ? 'green' : null}
             />
           </View>
         )}
