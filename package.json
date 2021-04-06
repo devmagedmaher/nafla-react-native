@@ -1,13 +1,13 @@
 {
   "name": "nfla1",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "build-apk": "cd android && cd app/build/outputs/apk/release && cp app-release.apk $npm_package_name-$npm_package_version.apk",
+    "build-apk": "cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && cp app-release.apk $npm_package_name-$npm_package_version.apk",
     "install-apk": "cd android/app/build/outputs/apk/release && adb install -r $npm_package_name-$npm_package_version.apk",
     "lint": "eslint ."
   },
