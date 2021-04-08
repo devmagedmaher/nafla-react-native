@@ -1,68 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/core';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import RNBC from 'react-native-bluetooth-classic';
+import React, { useEffect, useContext } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { BluetoothContext } from '../index';
 
 
-const HomeScreen = ({ navigation, route }) => {
-  const { deviceId } = route.params;
-  const [isLoading, setIsLoading] = useState(true);
+const HomeScreen = ({ navigation }) => {
+  const { state: sensorState } = useContext(BluetoothContext);
 
-  
-  const handleOnCloseDistance = text => {
+
+  const startConversation = text => {
     navigation.navigate('message', {
       data: {
         message: 'مَرْحَبَاً !\nيُمْكِنُكَ سُؤَالِي أحَدَ الأسْئِلَة التَالِية..',
       },
       goToOnEnd: 'qa'
-    })
+    });
   }
-
-  const stopOnDataReceived = subscription => {
-    console.log('stop Receiving data from arduino');
-    subscription.remove();
-  }
-
-  useFocusEffect(
-    React.useCallback(() => {
-
-      let subscription = () => 0;
-      RNBC.getConnectedDevice(deviceId)
-        .then(device => {
-          console.log('start receiving data from arduino..');
-          subscription = device.onDataReceived(({ data }) => {
-            console.log({ data });
-            if (data.replace(/^\s+|\s+$/g, '') == '1') {
-              console.log('starting conversation..');
-              stopOnDataReceived(subscription);
-              handleOnCloseDistance();
-            }
-          })
-        })
-        .catch(error => {
-          console.log({ error });
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-  
-      return () => {
-        stopOnDataReceived(subscription);
-      }  
-
-    }, [])
-  );
 
   useEffect(() => {
-  }, [navigation]);
+
+    if (sensorState === true) {
+      startConversation();
+    }
+    
+  }, [sensorState]);
+
 
   return (<>
     <View style={styles.container}>
-      {isLoading ? (
-        <ActivityIndicator size='large' color='999' />
-      ) : (
-        <Text style={styles.text}>إقترب للبدأ..</Text>
-      )}
+      <Text style={styles.text}>إقترب للبدأ..</Text>
     </View>
   </>)
 }

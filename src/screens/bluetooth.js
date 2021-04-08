@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { StackActions } from '@react-navigation/routers';
 import { View, Text, ActivityIndicator, FlatList, Button, StyleSheet, Alert } from 'react-native';
 import RNBC from 'react-native-bluetooth-classic';
+import { BluetoothContext } from '../index';
 
 
 const BluetoothScreen = ({ navigation }) => {
+  const { setConnectedDevice } = useContext(BluetoothContext);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [pairedList, setPairedList] = useState([]);
@@ -45,10 +47,12 @@ const BluetoothScreen = ({ navigation }) => {
         Alert.alert(null, 'أنت بالفعل متصل بهذا الجهاز');
       }
       navigation.dispatch(
-        StackActions.replace('home', { deviceId: device.id })
-      );      
+        StackActions.replace('home')
+      );
+      setConnectedDevice(device.id);
     } catch (error) {
       console.log({ error });
+      Alert.alert(null, 'حدث خطأ ما !');
     }
     setIsLoading(false);
   }

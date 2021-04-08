@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Text, ToastAndroid } from 'react-native';
 import QAList from '../constants/qa-list';
 import AutoListener from '../components/auto-listener';
 import { assistant } from '../services/ibm-watson';
+import { BluetoothContext } from '../index';
 
 
 const QAScreen = ({ navigation }) => {
+  const { state: sensorState } = useContext(BluetoothContext);
   const [error, setError] = useState(false);
 
 
@@ -27,6 +29,14 @@ const QAScreen = ({ navigation }) => {
         setError(true);
       });
   }
+
+  useEffect(() => {
+
+    if (sensorState === false) {
+      navigation.navigate('home');
+    }
+    
+  }, [sensorState]);
 
 
   return (<>
