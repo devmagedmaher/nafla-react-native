@@ -6,7 +6,9 @@ import HomeScreen from './screens/home';
 import QAScreen from './screens/qa';
 import MessageScreen from './screens/message';
 import Tts from 'react-native-tts';
-import RNBC from 'react-native-bluetooth-classic';
+import { startBackgroundListener, stopBackgroundListener } from './headless/bluetooth';
+import { AppState } from 'react-native';
+import invokeApp from 'react-native-invoke-app';
 
 
 const Stack = createStackNavigator();
@@ -18,7 +20,7 @@ const BluetoothContext = createContext({
 
 
 const App = () => {
-  const [deviceId, setDeviceId] = useState(null);
+  const [device, setDevice] = useState(null);
   const [state, _setState] = useState(false);
   const stateRef = useRef(state);
   let timer = null;
@@ -33,7 +35,7 @@ const App = () => {
 
   const handleDataReceived = ({ data }) => {
     const filteredData = data.replace(/^\s+|\s+$/g, '');
-    // console.log('data: ', filteredData);
+    console.log('data (foreground): ', filteredData, Math.random(), AppState.currentState);
     // console.log('state: ', stateRef.current);
     // console.log('timer: ', timer);
 
@@ -41,6 +43,9 @@ const App = () => {
     // if sensor is detecting..
     if (filteredData == '1') {
       if (!stateRef.current) {
+        if (AppState.currentState === 'background') {
+          invokeApp();
+        }
         setState(true);
       }
       if (timer) {
@@ -64,26 +69,24 @@ const App = () => {
   }
   
   useEffect(() => {
-    if (deviceId) {
+    if (device) {
+      console.log('start receiving data from arduino..');
       // bluetooth onDataReceived listener
-      let subscription = { remove: () => {} };
-      RNBC.getConnectedDevice(deviceId)
-        .then(device => {
-          console.log('start receiving data from arduino..');
-          // bluetooth onDataReceived listener
-          subscription = device.onDataReceived(handleDataReceived);
-        })
-        .catch(error => {
-          console.log({ error });
-        })
+      const subscription = device.onDataReceived(handleDataReceived);
 
       return () => {
+        console.log('remove listener, device: ', device.id);
         subscription.remove();
+        console.log('start listener from background, device: ', device.id);
+        startBackgroundListener(device);
       }
     }
-  }, [deviceId])
+  }, [device])
 
   useEffect(() => {
+    // stop bluetooth data background listner
+    stopBackgroundListener();
+
     // text-to-speach configuration
     Tts.getInitStatus();
     Tts.setDefaultLanguage('ar');
@@ -94,9 +97,9 @@ const App = () => {
 
   }, [])
 
-  const setConnectedDevice = id => {
-    console.log('setConnectedDevice: ', id);
-    setDeviceId(id);
+  const setConnectedDevice = device => {
+    console.log('setConnectedDevice: ', device.id);
+    setDevice(device);
   }
 
 

@@ -27,12 +27,38 @@ const BluetoothScreen = ({ navigation }) => {
       .finally(() => setIsLoading(false));
   }
 
+  const getConnectedDevices = () => {
+    return RNBC.getConnectedDevices()
+
+      // .then(data => console.log({ data }))
+
+      .catch(error => console.log({ error }));
+  }
+  
   useEffect(() => {
     
-    getPairedDevices();
+    getConnectedDevices()
+
+      .then(([device]) => {
+        if (device) {
+          afterDeviceConnection(device);
+        }
+        else {
+          getPairedDevices();
+        }
+      })
 
   }, []);
 
+  const afterDeviceConnection = device => {
+    // start foreground listener
+    setConnectedDevice(device);
+    // navigation to home screen;
+    navigation.dispatch(
+      StackActions.replace('home')
+    );
+  }
+  
   const connectToDevice = async device => {
     setIsLoading(true);
 
@@ -46,10 +72,7 @@ const BluetoothScreen = ({ navigation }) => {
         console.log(device.name, ' device is already connected.');
         Alert.alert(null, 'أنت بالفعل متصل بهذا الجهاز');
       }
-      navigation.dispatch(
-        StackActions.replace('home')
-      );
-      setConnectedDevice(device.id);
+      afterDeviceConnection(device)
     } catch (error) {
       console.log({ error });
       Alert.alert(null, 'حدث خطأ ما !');
