@@ -2,7 +2,12 @@ import VIForegroundService from '@voximplant/react-native-foreground-service';
 import { Platform } from 'react-native';
 
 
-const start = async () => {
+/**
+ * Start Sensor's foreground service
+ * 
+ * @returns Promise
+ */
+export const startForegroundService = async () => {
   if (Platform.Version >= 26) {
     const channelConfig = {
         id: 'ForegroundServiceChannel',
@@ -14,21 +19,27 @@ const start = async () => {
     await VIForegroundService.createNotificationChannel(channelConfig);
   }
   const notificationConfig = {
-      id: 3456,
-      title: 'Distance Sensor',
-      text: 'Distance Sensor is running..',
-      icon: 'ic_notification',
-      priority: 0
+    id: 3456,
+    title: 'Distance Sensor',
+    text: 'Distance Sensor is running..',
+    icon: 'ic_notification',
+    priority: 0
   };
   if (Platform.Version >= 26) {
       notificationConfig.channelId = 'ForegroundServiceChannel';
   }
-  console.log('starting service...');
-  await VIForegroundService.startService(notificationConfig);
-  console.log('started service');
+  return await VIForegroundService.startService(notificationConfig);
 };
 
 
-export default {
-  start,
-};
+/**
+ * Stop Sensor's foreground service
+ * 
+ * @returns Promise
+ */
+export const stopForegroundService = async () => {
+  return await VIForegroundService.stopService()
+    .catch(error => {
+      console.log(error);
+    });
+}

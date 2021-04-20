@@ -7,8 +7,12 @@ import QAScreen from './screens/qa';
 import MessageScreen from './screens/message';
 import Tts from 'react-native-tts';
 import { startBackgroundListener, stopBackgroundListener } from './headless/bluetooth';
-import { AppState } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import invokeApp from 'react-native-invoke-app';
+import {
+  startForegroundService,
+  stopForegroundService,
+} from './headless/foreground-service';
 
 
 const Stack = createStackNavigator();
@@ -67,24 +71,38 @@ const App = () => {
       }
     }
   }
-  
+
+  /**
+   * on bluetooth device connection
+   * 
+   */
   useEffect(() => {
     if (device) {
-      console.log('start receiving data from arduino..');
+      stopForegroundService();
+
       // bluetooth onDataReceived listener
+      console.log('start receiving data from arduino..');
       const subscription = device.onDataReceived(handleDataReceived);
 
       return () => {
-        console.log('remove listener, device: ', device.id);
+        console.log('removing app listener..');
         subscription.remove();
-        console.log('start listener from background, device: ', device.id);
+
+        console.log('starting background listener..');
         startBackgroundListener(device);
-      }
+
+        console.log('starting foreground service..');
+        startForegroundService();
+      }    
     }
   }, [device])
 
+  /**
+   * on App launch
+   * 
+   */
   useEffect(() => {
-    // stop bluetooth data background listner
+    // stop bluetooth data background listner if exists
     stopBackgroundListener();
 
     // text-to-speach configuration
