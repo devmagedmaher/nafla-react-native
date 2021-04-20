@@ -105,13 +105,31 @@ const App = () => {
     // stop bluetooth data background listner if exists
     stopBackgroundListener();
 
-    // text-to-speach configuration
-    Tts.getInitStatus();
-    Tts.setDefaultLanguage('ar');
-    Tts.voices()
-      .then(voices => voices.filter(e => e.language.startsWith('ar')))
+    
+  /**
+   * text-to-speach setup configuration
+   */ 
+    // initialize engine.
+    Tts.getInitStatus()
+
+    // set default language to arabic
+      .then(() => Tts.setDefaultLanguage('ar'))
+
+    // get all available voices
+      .then(() => Tts.voices())
+
+    // check if there is available voice
+      .then(voices => voices || new Error('No voices found.'))
+
+    // set the first voice as a default voice
       .then(data => data[0].id)
-      .then(voiceId => Tts.setDefaultVoice(voiceId));
+      .then(voiceId => Tts.setDefaultVoice(voiceId))
+
+    // show errors
+      .catch(error => {
+        console.log();
+        Alert.alert('حدث خطأ أثناء إعداد محرك الكلام', `\n كود الخطأ: ${error.code}`);
+      });
 
   }, [])
 
