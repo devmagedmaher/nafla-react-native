@@ -75,7 +75,7 @@ const BluetoothScreen = ({ navigation }) => {
       afterDeviceConnection(device)
     } catch (error) {
       console.log({ error });
-      Alert.alert(null, 'حدث خطأ ما !');
+      Alert.alert('حدث خطأ أثناء الاتصال بالبلوتوث !', error.code || null);
     }
     setIsLoading(false);
   }
