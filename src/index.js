@@ -118,16 +118,25 @@ const App = () => {
     // get all available voices
       .then(() => Tts.voices())
 
-    // check if there is available voice
-      .then(voices => voices || new Error('No voices found.'))
+    // get all arabic voices
+      .then(voices => voices.filter(e => e.language.startsWith('ar')))
+
+    // check if there is any available voice
+      .then(voices => {
+        if (!voices[0]) {
+          const error = new Error('No voices found.');
+          error.code = 'no_voices_found';
+          throw error;
+        }
+        return voices[0].id;
+      })
 
     // set the first voice as a default voice
-      .then(data => data[0].id)
       .then(voiceId => Tts.setDefaultVoice(voiceId))
 
     // show errors
       .catch(error => {
-        console.log();
+        console.log(error);
         Alert.alert('حدث خطأ أثناء إعداد محرك الكلام', `\n كود الخطأ: ${error.code}`);
       });
 
