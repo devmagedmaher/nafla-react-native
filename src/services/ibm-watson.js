@@ -8,5 +8,9 @@ const assistant = inputText => {
   return axios.post(host + '/ibm-watson/assistant', { inputText });
 }
 
+const getQuestions = () => {
+  return axios.get(host + '/ibm-watson/dialog');
+}
 
-export { assistant };
+
+export { assistant, getQuestions };

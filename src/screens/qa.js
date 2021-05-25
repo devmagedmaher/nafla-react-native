@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Text, ToastAndroid } from 'react-native';
-import QAList from '../constants/qa-list';
+import { View, FlatList, StyleSheet, Text, ToastAndroid, ActivityIndicator } from 'react-native';
 import AutoListener from '../components/auto-listener';
-import { assistant } from '../services/ibm-watson';
+import { assistant, getQuestions } from '../services/ibm-watson';
 import { BluetoothContext } from '../index';
 
 
 const QAScreen = ({ navigation }) => {
   const { state: sensorState } = useContext(BluetoothContext);
   const [error, setError] = useState(false);
+  const [isQuestionsLoading, setIsQuestionsLoading] = useState(false);
+  const [questions, setQuestinos] = useState([]);
 
 
   const handleOnListenerResult = text => {
@@ -35,20 +36,41 @@ const QAScreen = ({ navigation }) => {
     if (sensorState === false) {
       navigation.navigate('home');
     }
+    else {
+      getQuestions()
+        .then(({ data }) => {
+          console.log({ data });
+          setQuestinos(data);
+        })
+        .catch(error => {
+          console.log({ error });
+          ToastAndroid.show('حدث خطأ بالسيرفر.', ToastAndroid.SHORT);
+        });
+    }
     
   }, [sensorState]);
 
 
+  useEffect(() => {
+
+
+  }, []);
+
+
   return (<>
     <View style={styles.container}>
-      <Text style={styles.title}>يمكنك سؤالي أحد الأسئلة التالية:-</Text>
-      <FlatList
-        data={QAList}
-        renderItem={({ item }) => (
-          <Text style={styles.listItem}>{item.text}</Text>
-        )}
-        keyExtractor={item => item.id.toString()}
-      />
+      <Text style={styles.title}>يمكنك سؤالي احد الاسئلة التالية :-</Text>
+      {isQuestionsLoading ? (
+        <ActivityIndicator size='small' color='#999' />
+      ) : (
+        <FlatList
+          data={questions}
+          renderItem={({ item }) => (
+            <Text style={styles.listItem}>{item.text}</Text>
+          )}
+          keyExtractor={item => item.id.toString()}
+        />
+      )}
     </View>
     <AutoListener onResult={handleOnListenerResult} restartListener={error} />
   </>)
