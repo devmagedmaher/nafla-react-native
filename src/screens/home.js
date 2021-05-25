@@ -36,7 +36,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
 
     if (sensorState === true) {
-      startConversation();
+      requestConversation();
     }
     
   }, [sensorState]);
