@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Text, ToastAndroid, ActivityIndicator } from 'react-native';
 import AutoListener from '../components/auto-listener';
 import { assistant, getQuestions } from '../services/ibm-watson';
-import { BluetoothContext } from '../index';
+import SensorContext from '../context/sensor';
+import Loading from '../components/loading';
 
 
 const QAScreen = ({ navigation }) => {
-  const { state: sensorState } = useContext(BluetoothContext);
+  const userSessionState = useContext(SensorContext);
   const [error, setError] = useState(false);
   const [isQuestionsLoading, setIsQuestionsLoading] = useState(false);
   const [questions, setQuestinos] = useState([]);
@@ -33,7 +34,7 @@ const QAScreen = ({ navigation }) => {
 
   useEffect(() => {
 
-    if (sensorState === false) {
+    if (userSessionState === false) {
       navigation.navigate('home');
     }
     else {
@@ -48,31 +49,21 @@ const QAScreen = ({ navigation }) => {
         });
     }
     
-  }, [sensorState]);
+  }, [userSessionState]);
 
 
-  useEffect(() => {
-
-
-  }, []);
-
-
-  return (<>
+  return isQuestionsLoading ? <Loading /> : (<>
     <View style={styles.container}>
       <Text style={styles.title}>يمكنك سؤالي احد الاسئلة التالية :-</Text>
-      {isQuestionsLoading ? (
-        <ActivityIndicator size='small' color='#999' />
-      ) : (
-        <FlatList
-          data={questions}
-          renderItem={({ item }) => (
-            <Text style={styles.listItem}>{item.text}</Text>
-          )}
-          keyExtractor={item => item.id.toString()}
-        />
-      )}
+      <FlatList
+        data={questions}
+        renderItem={({ item }) => (
+          <Text style={styles.listItem}>{item.text}</Text>
+        )}
+        keyExtractor={item => item.id.toString()}
+      />
     </View>
-    <AutoListener onResult={handleOnListenerResult} restartListener={error} />
+    {/* <AutoListener onResult={handleOnListenerResult} restartListener={error} /> */}
   </>)
 }
 
@@ -81,14 +72,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'stretch',
     justifyContent: 'center',
-    paddingTop: 50,
+    paddingTop: 10,
   },
   listItem: {
     textAlign: 'center',
     fontSize: 18,
     color: '#666',
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 2,
+    borderBottomColor: '#dadada',
+    borderBottomWidth: 1,
     marginVertical: 10,
     paddingBottom: 7,
   },
@@ -96,10 +87,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 22,
     color: '#333',
-    marginBottom: 50,
+    marginBottom: 20,
     padding: 5,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#999',
+    borderBottomWidth: 2,
+    borderBottomColor: '#aaa',
   },
 });
 

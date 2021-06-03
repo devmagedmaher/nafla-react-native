@@ -1,19 +1,31 @@
 import axios from 'axios'
+import storage from '../utils/storage';
 
 const host = __DEV__ ? 'http://192.168.1.97:3001/api' : 'https://nfla1-rest-api.herokuapp.com/api';
 
 
-const sendMessage = inputText => {
-  console.log({ inputText });
-  return axios.post(host + '/mobile/message', { inputText });
+const sendMessage = async inputText => {
+  const workspace = await storage.get('workspace');
+  console.log({ inputText, workspace });
+  return axios.post(host + '/mobile/message', { inputText }, {
+    headers: {
+      'Workspace-Id': workspace.id,
+    }
+  });
 }
 
 const fetchWorkspaces = () => {
   return axios.get(host + '/mobile/workspaces');
 }
 
-const getQuestions = () => {
-  return axios.get(host + '/ibm-watson/dialog');
+const getQuestions = async () => {
+  const workspace = await storage.get('workspace');
+  console.log({ workspace });
+  return axios.get(host + '/mobile/dialogs', {
+    headers: {
+      'Workspace-Id': workspace.id,
+    }
+  });
 }
 
 

@@ -143,7 +143,7 @@ const AppStackScreens = () => {
 
 
   return isBluetoothConnecting || isTtsInitializing ? <Loading /> : (
-    <SensorContext.Provider value={{}}>
+    <SensorContext.Provider value={userSessionState}>
       <View style={{
         height: 3,
         opacity: 0.5,
