@@ -1,70 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import Tts from 'react-native-tts';
 import Stepper from '../../components/stepper';
-import Loading from '../../components/loading';
+import ListSelector from '../../components/list-selector';
+import storage from '../../utils/storage';
 
 
 const TTSEngineScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [engines, setEngines] = useState([]);
+  const [selectedEngeine, setSelectedEngine] = useState({});
 
 
   /**
    * Get bluetooth paried devices
    * 
    */
-  const getPairedDevices = async () => {
+  const getEngines = async () => {
+    Tts.getInitStatus()
 
+    // get all available voices
+      .then(() => Tts.engines())
+
+    // get all arabic voices
+      .then(engines => setEngines(engines))
+
+      .finally(() => setIsLoading(false));
   }
 
   /**
    * ON Screen Mount
    * 
    */
-  useEffect(() => { getPairedDevices() }, [])
+  useEffect(() => { getEngines() }, [])
 
   /**
    * Try `getPairedDevices` again.
    * 
    */
-  const tryAgain = () => {
-
+  const refresh = () => {
+    getEngines();
   }
 
-  const selectEngine = () => {
-    navigation.navigate('voices')
+  const selectEngine = engine => {
+    setSelectedEngine(engine);
+    console.log(engine);
+  }
+
+  const confirmSelection = () => {
+    console.log({ selectedEngeine });
+
+    Tts.setDefaultEngine(selectedEngeine.name);
+    storage.set('tts:engine', {
+      name: selectedEngeine.name,
+      label: selectedEngeine.label,
+    });
+    navigation.navigate('voices');
   }
 
 
   return (<>
-    <View style={styles.container}>
-      {isLoading ? (
-        <Loading text='Loaidng text-to-speach engines' />
-      ) : error ? (
-        <View>
-          <Text style={styles.error}>{error}</Text>
-          <Button title='Try again' onPress={tryAgain} />
-        </View>
-      ) : (
-        <Text>Engines list</Text>
-      )}
-    </View>
-    <Stepper onNextPress={selectEngine} />
-  </>);
+    <ListSelector
+      listTitle='اختر محرك التحدث'
+      data={engines}
+      isLoading={isLoading}
+      error={error}
+      onItemPress={selectEngine}
+      itemTitleKey='label'
+      currentItem={selectedEngeine}
+      onRefresh={refresh}
+    />
+    <Stepper
+      onNextPress={confirmSelection}
+      NextDisabled={!selectedEngeine.name} 
+    />
+  </>)
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: {
-    marginBottom: 20,
-    color: 'red',
-  },
-});
 
 
 export default TTSEngineScreen;

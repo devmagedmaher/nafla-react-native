@@ -17,7 +17,8 @@ const ListSelector = ({
   empty,
   onItemPress,
   currentItem,
-  title,
+  listTitle,
+  itemTitleKey,
   ...props}) => {
 
 
@@ -30,19 +31,19 @@ const ListSelector = ({
         ) : (
           <FlatList
             data={data}
-            key={({ item }) => item.id}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View style={styles.listItem}>
                 <Button 
-                  title={item.name}
+                  title={item[itemTitleKey]}
                   onPress={() => onItemPress(item)}
-                  color={currentItem.id === item.id ? 'green' : null}
+                  color={currentItem === item ? 'green' : null}
                 />
               </View>
             )}
             ListEmptyComponent={<Text>{empty}</Text>}
             refreshing={isLoading}
-            ListHeaderComponent={<Text style={styles.title}>{title}</Text>}
+            ListHeaderComponent={<Text style={styles.title}>{listTitle}</Text>}
             {...props}
           />
         )
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   title: {
     fontSize: 22,
@@ -81,6 +82,8 @@ ListSelector.propTypes = {
   error: propTypes.string,
   empty: propTypes.string,
   onItemPress: propTypes.func,
+  listTile: propTypes.string,
+  itemTitleKey: propTypes.string,
 }
 
 ListSelector.defaultProps = {
@@ -89,6 +92,8 @@ ListSelector.defaultProps = {
   error: 'error',
   empty: 'no data',
   onItemPress: () => 0,
+  listTitle: null,
+  itemTitleKey: 'name',
 }
 
 

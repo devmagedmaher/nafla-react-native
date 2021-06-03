@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RNBC from 'react-native-bluetooth-classic';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { Alert } from 'react-native';
 import Stepper from '../../components/stepper';
 import Loading from '../../components/loading';
 import ListSelector from '../../components/list-selector';
@@ -62,7 +62,7 @@ const BluetoothScreen = ({ navigation }) => {
 
     try {
       await selectedDevice.connect();
-      await storage.set('bluetooth-device', {
+      await storage.set('bluetooth:device', {
         id: selectedDevice.id,
         name: selectedDevice.name,
       });
@@ -78,7 +78,7 @@ const BluetoothScreen = ({ navigation }) => {
 
   return (<>
     <ListSelector
-      title='اختر جهاز البلوتوث'
+      listTitle='اختر جهاز البلوتوث'
       data={pairedDevices}
       isLoading={isLoading}
       error={error}

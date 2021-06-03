@@ -17,11 +17,9 @@ const MainNavigator = () => {
   useEffect(() => {
     console.log({ firstTimer });
     
-    settings.get('old-user2')
+    settings.get('is_old_user')
       .then(data => {
-        console.log({ data, is: !data })
         if (!data) {
-          // setFirstTimer(true);
           firstTimer.set(true);
         }
         setIsLoading(false)
