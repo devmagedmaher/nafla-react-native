@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Text, ToastAndroid, ActivityIndicator } from 'react-native';
 import AutoListener from '../components/auto-listener';
-import { assistant, getQuestions } from '../services/ibm-watson';
+import { getQuestions, sendMessage } from '../services/ibm-watson';
 import SensorContext from '../context/sensor';
 import Loading from '../components/loading';
 
@@ -16,7 +16,7 @@ const QAScreen = ({ navigation }) => {
   const handleOnListenerResult = text => {
     setError(false);
 
-    assistant(text)
+    sendMessage(text)
       .then(({ data }) => {
         console.log({ data });
         navigation.navigate('message', {
@@ -63,7 +63,7 @@ const QAScreen = ({ navigation }) => {
         keyExtractor={item => item.id.toString()}
       />
     </View>
-    {/* <AutoListener onResult={handleOnListenerResult} restartListener={error} /> */}
+    <AutoListener onResult={handleOnListenerResult} restartListener={error} />
   </>)
 }
 
