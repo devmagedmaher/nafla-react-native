@@ -14,8 +14,9 @@ const MainNavigator = () => {
   // check settings data
   useEffect(() => {
     
-    settings.get('bluetooth')
+    settings.get('old-user')
       .then(data => {
+        console.log({ data, is: !data })
         if (!data) {
           setFirstTime(true);
         }
@@ -28,9 +29,9 @@ const MainNavigator = () => {
   return isLoading ? <Loading /> : (
     <NavigationContainer>
         {firstTime ? (
-          <AppStackScreens />
-        ) : (
           <SetupStackScreens />
+        ) : (
+          <AppStackScreens />
         )}
     </NavigationContainer>
   );

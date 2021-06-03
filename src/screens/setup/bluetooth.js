@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
-import Loading from '../../components/loading';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import Stepper from '../../components/stepper';
+import Loading from '../../components/loading';
 
 
-const BluetoothScreen = () => {
+const BluetoothScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -37,6 +37,10 @@ const BluetoothScreen = () => {
     getPairedDevices();
   }
 
+  const connectToDevice = () => {
+    navigation.navigate('engines');
+  }
+
 
   return (<>
     <View style={styles.container}>
@@ -51,7 +55,7 @@ const BluetoothScreen = () => {
         <Text>bluetooth list</Text>
       )}
     </View>
-    <Stepper />
+    <Stepper onNextPress={connectToDevice} />
   </>);
 }
 
