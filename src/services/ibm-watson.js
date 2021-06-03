@@ -1,12 +1,16 @@
 import axios from 'axios'
 
-const host = __DEV__ ? 'http://192.168.1.97:3000/api' : 'https://nfla1-rest-api.herokuapp.com/api';
+const host = __DEV__ ? 'http://192.168.1.97:3001/api' : 'https://nfla1-rest-api.herokuapp.com/api';
 
 
-const assistant = inputText => {
+const sendMessage = inputText => {
   console.log({ inputText });
-  return axios.post(host + '/ibm-watson/assistant', { inputText });
+  return axios.post(host + '/mobile/message', { inputText });
+}
+
+const fetchWorkspaces = () => {
+  return axios.get(host + '/mobile/workspaces');
 }
 
 
-export { assistant };
+export { sendMessage, fetchWorkspaces };

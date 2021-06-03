@@ -25,10 +25,6 @@ const ListSelector = ({
 
   return (
     <View style={styles.container}>
-      {
-        error ? (
-          <Text>{error}</Text>
-        ) : (
           <FlatList
             data={data}
             keyExtractor={(item, index) => index.toString()}
@@ -41,13 +37,11 @@ const ListSelector = ({
                 />
               </View>
             )}
-            ListEmptyComponent={<Text>{empty}</Text>}
+            ListFooterComponent={<Text>{error || (data.length === 0 && empty)}</Text>}
             refreshing={isLoading}
             ListHeaderComponent={<Text style={styles.title}>{listTitle}</Text>}
             {...props}
           />
-        )
-      }
     </View>
   );
 }
