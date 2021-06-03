@@ -3,14 +3,14 @@ import propTypes from 'prop-types';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
 
-const Stepper = ({ text, onNextPress }) => {
+const Stepper = ({ text, onNextPress, NextDisabled }) => {
 
   return (
     <View style={styles.container}>
-      <Button title='التالي' onPress={onNextPress} />
+      <Button title='التالي' onPress={onNextPress} disabled={NextDisabled} />
       <Text>{text}</Text>
     </View>
-  )
+  );
 }
 
 
@@ -28,12 +28,14 @@ const styles = StyleSheet.create({
 Stepper.propTypes = {
   text: propTypes.string,
   onNextPress: propTypes.func,
+  NextDisabled: propTypes.bool,
 }
 
 
 Stepper.defaultProps = {
   text: null,
   onNextPress: () => 0,
+  NextDisabled: false,
 }
 
 

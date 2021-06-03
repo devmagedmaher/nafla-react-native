@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import RNBC from 'react-native-bluetooth-classic';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import Stepper from '../../components/stepper';
 import Loading from '../../components/loading';
+import ListSelector from '../../components/list-selector';
+import storage from '../../utils/storage';
 
 
 const BluetoothScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pairedDevices, setPairedDevices] = useState([]);
+  const [selectedDevice, setSelectedDevice] = useState({});
+  const [isConnecting, setIsConnecting] = useState(false);
 
 
   /**
@@ -14,10 +20,18 @@ const BluetoothScreen = ({ navigation }) => {
    * 
    */
   const getPairedDevices = async () => {
-    setTimeout(() => {
-      // setError('Something went wrong.');
-      setIsLoading(false);
-    }, Math.random()*2000+1000);
+    RNBC.getBondedDevices()
+
+      .then(devices => {
+        setPairedDevices(devices);
+      })
+
+      .catch(error => {
+        console.log({ error });
+        setErrorMessage(error.message);
+      })
+
+      .finally(() => setIsLoading(false));
   }
 
   /**
@@ -30,47 +44,55 @@ const BluetoothScreen = ({ navigation }) => {
    * Try `getPairedDevices` again.
    * 
    */
-  const tryAgain = () => {
+  const refresh = () => {
     console.log('try again')
     setError(null);
     setIsLoading(true);
     getPairedDevices();
   }
 
-  const connectToDevice = () => {
-    navigation.navigate('engines');
+  const selectDevice = device => {
+    setSelectedDevice(device);
+    console.log(device);
+  }
+
+  const connectToDevice = async () => {
+    if (isConnecting) return false;
+    setIsConnecting(true);
+
+    try {
+      await selectedDevice.connect();
+      await storage.set('bluetooth-device', {
+        id: selectedDevice.id,
+        name: selectedDevice.name,
+      });
+      navigation.navigate('engines');
+    } catch (error) {
+      console.log({ error });
+      Alert.alert('حدث خطأ أثناء الاتصال بالبلوتوث !', error.code || null);
+    }
+
+    setIsConnecting(false);
   }
 
 
   return (<>
-    <View style={styles.container}>
-      {isLoading ? (
-        <Loading text='Loaidng paired devices' />
-      ) : error ? (
-        <View>
-          <Text style={styles.error}>{error}</Text>
-          <Button title='Try again' onPress={tryAgain} />
-        </View>
-      ) : (
-        <Text>bluetooth list</Text>
-      )}
-    </View>
-    <Stepper onNextPress={connectToDevice} />
-  </>);
+    <ListSelector
+      title='اختر جهاز البلوتوث'
+      data={pairedDevices}
+      isLoading={isLoading}
+      error={error}
+      onItemPress={selectDevice}
+      currentItem={selectedDevice}
+      onRefresh={refresh}
+    />
+    {isConnecting && <Loading size='small' />}
+    <Stepper
+      onNextPress={connectToDevice}
+      NextDisabled={!selectedDevice.id} 
+    />
+  </>)
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  error: {
-    marginBottom: 20,
-    color: 'red',
-  },
-});
 
 
 export default BluetoothScreen;

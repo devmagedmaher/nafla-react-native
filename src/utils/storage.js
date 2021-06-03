@@ -57,6 +57,7 @@ const update = async (key, value) => {
 
     console.log(error);
     return false;
+
   }
 
 }
@@ -74,8 +75,24 @@ const keyExists = async key => {
 }
 
 
+const clear = async () => {
+  try {
+
+    return await AsyncStorage.clear();
+    
+  }
+  catch (error) {
+
+    console.log(error);
+    return false;
+
+  }
+}
+
+
 export default {
   set,
   get,
   update,
+  clear,
 }
