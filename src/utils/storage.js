@@ -15,7 +15,7 @@ const set = async (key, value) => {
 
   try {
 
-    return await AsyncStorage.setItem(`settings:${key}`, JSON.stringify(value));
+    return await AsyncStorage.setItem(`@storage:${key}`, JSON.stringify(value));
 
   }
   catch (error) {
@@ -28,11 +28,11 @@ const set = async (key, value) => {
 }
 
 
-const get = async (key, value) => {
+const get = async (key  ) => {
 
   try {
 
-    const value = await AsyncStorage.getItem(`settings:${key}`);
+    const value = await AsyncStorage.getItem(`@storage:${key}`);
     return parseValue(value);
 
   }
@@ -44,6 +44,23 @@ const get = async (key, value) => {
   }
 
 }
+
+
+const update = async (key, value) => {
+
+  try {
+
+    return await AsyncStorage.mergeItem(`@storage:${key}`, JSON.stringify(value));
+
+  }
+  catch (error) {
+
+    console.log(error);
+    return false;
+  }
+
+}
+
 
 const keyExists = async key => {
   if (Array.isArray(key)) {
@@ -60,4 +77,5 @@ const keyExists = async key => {
 export default {
   set,
   get,
+  update,
 }
