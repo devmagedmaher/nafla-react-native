@@ -1,33 +1,55 @@
-import React, { useEffect, useContext } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { BluetoothContext } from '../index';
+import React, { useEffect, useContext, useState } from 'react';
+import { StyleSheet, View, Text, ActivityIndicator, ToastAndroid } from 'react-native';
+import SensorContext from '../context/sensor';
+import { sendMessage } from '../services/ibm-watson';
 
 
 const HomeScreen = ({ navigation }) => {
-  const { state: sensorState } = useContext(BluetoothContext);
+  const userSessionState = useContext(SensorContext);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const startConversation = text => {
     navigation.navigate('message', {
       data: {
-        message: 'مَرْحَبَاً !\nيُمْكِنُكَ سُؤَالِي أحَدَ الأسْئِلَة التَالِية..',
+        message: text,
       },
       goToOnEnd: 'qa'
     });
   }
 
+  const requestConversation = () => {
+    if (isLoading) return false;
+    setIsLoading(true);
+
+    sendMessage()
+      .then(({ data }) => {
+        console.log({ data });
+        startConversation(data.message);
+      })
+      .catch(error => {
+        console.log({ error });
+        ToastAndroid.show('حدث خطأ بالسيرفر.', ToastAndroid.SHORT);
+      })
+      .finally(() => setIsLoading(false));
+  }
+
   useEffect(() => {
 
-    if (sensorState === true) {
-      startConversation();
+    if (userSessionState === true) {
+      requestConversation();
     }
     
-  }, [sensorState]);
+  }, [userSessionState]);
 
 
   return (<>
     <View style={styles.container}>
-      <Text style={styles.text}>إقترب للبدأ..</Text>
+      {isLoading ? (
+        <ActivityIndicator size='small' color='#999' />
+      ) : (<>
+        <Text style={styles.text}>إقترب للبدأ..</Text>
+      </>)}
     </View>
   </>)
 }
