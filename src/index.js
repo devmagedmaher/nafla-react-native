@@ -14,6 +14,8 @@ import {
   stopForegroundService,
 } from './headless/foreground-service';
 import MainNavigator from './navigations';
+import FirstTimerContext, { defaultValue } from './context/first-timer';
+
 
 
 const Stack = createStackNavigator();
@@ -148,8 +150,13 @@ const App = () => {
   //   setDevice(device);
   // }
 
+  const [firstTimer, setFirstTimer] = useState(false);
 
-  return <MainNavigator />
+  return (
+    <FirstTimerContext.Provider value={{ value: firstTimer, set: setFirstTimer }}>
+      <MainNavigator />
+    </FirstTimerContext.Provider>
+  );
 }
 
 

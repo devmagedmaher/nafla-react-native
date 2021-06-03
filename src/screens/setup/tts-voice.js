@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import storage from '../../utils/storage';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import Stepper from '../../components/stepper';
 import Loading from '../../components/loading';
+import FirstTimerContext from '../../context/first-timer';
 
 
 const TTSVoiceScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const firstTimer = useContext(FirstTimerContext);
 
 
   /**
@@ -33,7 +35,10 @@ const TTSVoiceScreen = ({ navigation }) => {
   }
 
   const selectVoice = () => {
-    storage.set('old-user', true);
+    // storage.get('old-user').then(console.log);
+    // return;
+    storage.set('old-user2', true)
+      .then(() => firstTimer.set(false));
   }
 
 
