@@ -12,5 +12,9 @@ const fetchWorkspaces = () => {
   return axios.get(host + '/mobile/workspaces');
 }
 
+const getQuestions = () => {
+  return axios.get(host + '/ibm-watson/dialog');
+}
 
-export { sendMessage, fetchWorkspaces };
+
+export { sendMessage, fetchWorkspaces, getQuestions };
