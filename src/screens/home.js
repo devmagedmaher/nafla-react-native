@@ -1,7 +1,6 @@
 import React, { useEffect, useContext } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { BluetoothContext } from '../index';
-import storage from '../utils/storage';
 
 
 const HomeScreen = ({ navigation }) => {
@@ -27,7 +26,6 @@ const HomeScreen = ({ navigation }) => {
 
 
   return (<>
-    <Button title='clear' onPress={() => storage.clear()} />
     <View style={styles.container}>
       <Text style={styles.text}>إقترب للبدأ..</Text>
     </View>
