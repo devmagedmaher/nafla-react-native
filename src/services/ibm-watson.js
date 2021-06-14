@@ -1,7 +1,7 @@
 import axios from 'axios'
 import storage from '../utils/storage';
 
-const host = __DEV__ ? 'http://192.168.1.97:3001/api' : 'https://nfla1-rest-api.herokuapp.com/api';
+const host = __DEV__ ? 'http://192.168.1.97:3001/api' : 'https://naflarobot.com/api';
 
 
 const sendMessage = async inputText => {
